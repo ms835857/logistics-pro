@@ -2,13 +2,16 @@ import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
 import Table from '../components/Table';
 import Modal from '../components/Modal';
+import ConfirmModal from '../components/ConfirmModal';
 import { Edit2, Trash2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const Suppliers = () => {
     const [suppliers, setSuppliers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editId, setEditId] = useState(null);
+    const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null });
     const [formData, setFormData] = useState({
         name: '',
         contact_person: '',
@@ -28,6 +31,7 @@ const Suppliers = () => {
             setSuppliers(res.data.data);
         } catch (error) {
             console.error(error);
+            toast.error('Failed to load suppliers');
         } finally {
             setLoading(false);
         }
@@ -42,13 +46,15 @@ const Suppliers = () => {
         try {
             if (editId) {
                 await api.put(`/suppliers/${editId}`, formData);
+                toast.success('Supplier updated successfully!');
             } else {
                 await api.post('/suppliers', formData);
+                toast.success('Supplier added successfully!');
             }
             closeModal();
             fetchSuppliers();
         } catch (error) {
-            alert(error.response?.data?.message || 'Operation failed');
+            toast.error(error.response?.data?.message || 'Operation failed');
         }
     };
 
@@ -65,14 +71,17 @@ const Suppliers = () => {
         setIsModalOpen(true);
     };
 
-    const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to deactivate this supplier?')) {
-            try {
-                await api.delete(`/suppliers/${id}`);
-                fetchSuppliers();
-            } catch (error) {
-                alert('Failed to delete supplier');
-            }
+    const triggerDelete = (id) => {
+        setConfirmDelete({ isOpen: true, id });
+    };
+
+    const executeDelete = async () => {
+        try {
+            await api.delete(`/suppliers/${confirmDelete.id}`);
+            toast.success('Supplier deleted successfully!');
+            fetchSuppliers();
+        } catch (error) {
+            toast.error('Failed to delete supplier');
         }
     };
 
@@ -101,10 +110,10 @@ const Suppliers = () => {
             accessor: 'actions',
             render: (row) => (
                 <div className="flex space-x-2">
-                    <button onClick={() => handleEdit(row)} className="p-1 text-primary hover:bg-primary/10 rounded">
+                    <button onClick={() => handleEdit(row)} className="p-1 text-primary hover:bg-primary/10 rounded transition-colors">
                         <Edit2 size={16} />
                     </button>
-                    <button onClick={() => handleDelete(row.id)} className="p-1 text-red-500 hover:bg-red-500/10 rounded">
+                    <button onClick={() => triggerDelete(row.id)} className="p-1 text-red-500 hover:bg-red-500/10 rounded transition-colors">
                         <Trash2 size={16} />
                     </button>
                 </div>
@@ -115,7 +124,9 @@ const Suppliers = () => {
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold text-white">Suppliers Database</h1>
+                <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 tracking-tight">
+                    Suppliers Database
+                </h1>
                 <button onClick={() => setIsModalOpen(true)} className="btn-primary">Add Supplier</button>
             </div>
             
@@ -160,6 +171,14 @@ const Suppliers = () => {
                     </button>
                 </form>
             </Modal>
+
+            <ConfirmModal 
+                isOpen={confirmDelete.isOpen} 
+                onClose={() => setConfirmDelete({ isOpen: false, id: null })}
+                onConfirm={executeDelete}
+                title="Deactivate Supplier"
+                message="Are you sure you want to deactivate this supplier? This action cannot be fully undone."
+            />
         </div>
     );
 };

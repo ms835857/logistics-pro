@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
 import Table from '../components/Table';
 import Modal from '../components/Modal';
+import ConfirmModal from '../components/ConfirmModal';
 import { Edit2, Trash2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const Inventory = () => {
     const [inventory, setInventory] = useState([]);
@@ -10,6 +12,7 @@ const Inventory = () => {
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editId, setEditId] = useState(null);
+    const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null });
     const [formData, setFormData] = useState({
         product_name: '',
         sku: '',
@@ -31,6 +34,7 @@ const Inventory = () => {
             setInventory(res.data.data);
         } catch (error) {
             console.error(error);
+            toast.error('Failed to load inventory');
         } finally {
             setLoading(false);
         }
@@ -55,13 +59,15 @@ const Inventory = () => {
         try {
             if (editId) {
                 await api.put(`/inventory/${editId}`, formData);
+                toast.success('Item updated successfully!');
             } else {
                 await api.post('/inventory', formData);
+                toast.success('Item added successfully!');
             }
             closeModal();
             fetchInventory();
         } catch (error) {
-            alert(error.response?.data?.message || 'Operation failed');
+            toast.error(error.response?.data?.message || 'Operation failed');
         }
     };
 
@@ -79,14 +85,17 @@ const Inventory = () => {
         setIsModalOpen(true);
     };
 
-    const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this item?')) {
-            try {
-                await api.delete(`/inventory/${id}`);
-                fetchInventory();
-            } catch (error) {
-                alert('Failed to delete item');
-            }
+    const triggerDelete = (id) => {
+        setConfirmDelete({ isOpen: true, id });
+    };
+
+    const executeDelete = async () => {
+        try {
+            await api.delete(`/inventory/${confirmDelete.id}`);
+            toast.success('Item deleted successfully!');
+            fetchInventory();
+        } catch (error) {
+            toast.error('Failed to delete item');
         }
     };
 
@@ -116,7 +125,7 @@ const Inventory = () => {
                         {row.quantity_in_stock}
                     </span>
                     {row.low_stock && (
-                        <span className="bg-red-500/20 text-red-500 text-[10px] px-2 py-0.5 rounded-full uppercase font-bold tracking-wider">
+                        <span className="pulse-alert text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider">
                             Low Stock
                         </span>
                     )}
@@ -129,10 +138,10 @@ const Inventory = () => {
             accessor: 'actions',
             render: (row) => (
                 <div className="flex space-x-2">
-                    <button onClick={() => handleEdit(row)} className="p-1 text-primary hover:bg-primary/10 rounded">
+                    <button onClick={() => handleEdit(row)} className="p-1 text-primary hover:bg-primary/10 rounded transition-colors">
                         <Edit2 size={16} />
                     </button>
-                    <button onClick={() => handleDelete(row.id)} className="p-1 text-red-500 hover:bg-red-500/10 rounded">
+                    <button onClick={() => triggerDelete(row.id)} className="p-1 text-red-500 hover:bg-red-500/10 rounded transition-colors">
                         <Trash2 size={16} />
                     </button>
                 </div>
@@ -143,7 +152,9 @@ const Inventory = () => {
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold text-white">Inventory Management</h1>
+                <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 tracking-tight">
+                    Inventory Management
+                </h1>
                 <button onClick={() => setIsModalOpen(true)} className="btn-primary">Add Item</button>
             </div>
             
@@ -195,6 +206,14 @@ const Inventory = () => {
                     </button>
                 </form>
             </Modal>
+
+            <ConfirmModal 
+                isOpen={confirmDelete.isOpen} 
+                onClose={() => setConfirmDelete({ isOpen: false, id: null })}
+                onConfirm={executeDelete}
+                title="Delete Inventory Item"
+                message="Are you sure you want to permanently delete this item from the inventory?"
+            />
         </div>
     );
 };

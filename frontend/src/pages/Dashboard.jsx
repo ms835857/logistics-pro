@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
 import { Package, Database, Truck, Users } from 'lucide-react';
+import { motion } from 'framer-motion';
+import GlobalMap from '../components/GlobalMap';
+import { StaggerContainer, StaggerItem } from '../components/StaggerList';
 
 const StatCard = ({ title, value, icon, color }) => (
-    <div className="glass-panel p-6 flex items-center justify-between hover:-translate-y-1 transition-transform duration-300">
+    <motion.div 
+        whileHover={{ scale: 1.05, rotateY: 5, rotateX: 5, zIndex: 10 }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        className="glass-panel p-6 flex items-center justify-between cursor-pointer"
+        style={{ perspective: 1000 }}
+    >
         <div>
             <p className="text-sm font-medium text-muted mb-1">{title}</p>
             <h3 className="text-3xl font-bold text-white">{value}</h3>
@@ -11,7 +19,7 @@ const StatCard = ({ title, value, icon, color }) => (
         <div className={`p-4 rounded-full ${color}`}>
             {icon}
         </div>
-    </div>
+    </motion.div>
 );
 
 const Dashboard = () => {
@@ -47,39 +55,54 @@ const Dashboard = () => {
     }, []);
 
     return (
-        <div className="space-y-6">
-            <h1 className="text-2xl font-bold text-white mb-8">Dashboard Overview</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard 
-                    title="Total Orders" 
-                    value={stats.orders} 
-                    icon={<Package size={24} />} 
-                    color="bg-blue-500/20 text-blue-500" 
-                />
-                <StatCard 
-                    title="Inventory Items" 
-                    value={stats.inventory} 
-                    icon={<Database size={24} />} 
-                    color="bg-purple-500/20 text-purple-500" 
-                />
-                <StatCard 
-                    title="Active Shipments" 
-                    value={stats.shipments} 
-                    icon={<Truck size={24} />} 
-                    color="bg-emerald-500/20 text-emerald-500" 
-                />
-                <StatCard 
-                    title="Total Suppliers" 
-                    value={stats.suppliers} 
-                    icon={<Users size={24} />} 
-                    color="bg-amber-500/20 text-amber-500" 
-                />
-            </div>
+        <div className="space-y-8">
+            <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 mb-8 tracking-tight">
+                Dashboard Overview
+            </h1>
             
-            <div className="mt-12 glass-panel p-8">
-                <h2 className="text-xl font-bold text-white mb-4">Welcome to LogisticsPro System</h2>
-                <p className="text-muted">Navigate through the system using the top menu. This dashboard is built with a dynamic UI, featuring smooth glassmorphism effects and modern styling to ensure a premium user experience.</p>
-            </div>
+            <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <StaggerItem>
+                    <StatCard 
+                        title="Total Orders" 
+                        value={stats.orders} 
+                        icon={<Package size={24} />} 
+                        color="bg-blue-500/20 text-blue-500" 
+                    />
+                </StaggerItem>
+                <StaggerItem>
+                    <StatCard 
+                        title="Inventory Items" 
+                        value={stats.inventory} 
+                        icon={<Database size={24} />} 
+                        color="bg-purple-500/20 text-purple-500" 
+                    />
+                </StaggerItem>
+                <StaggerItem>
+                    <StatCard 
+                        title="Active Shipments" 
+                        value={stats.shipments} 
+                        icon={<Truck size={24} />} 
+                        color="bg-emerald-500/20 text-emerald-500" 
+                    />
+                </StaggerItem>
+                <StaggerItem>
+                    <StatCard 
+                        title="Total Suppliers" 
+                        value={stats.suppliers} 
+                        icon={<Users size={24} />} 
+                        color="bg-amber-500/20 text-amber-500" 
+                    />
+                </StaggerItem>
+            </StaggerContainer>
+            
+            <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.8 }}
+                className="mt-8"
+            >
+                <GlobalMap />
+            </motion.div>
         </div>
     );
 };
