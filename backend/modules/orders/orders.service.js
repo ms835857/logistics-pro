@@ -1,8 +1,8 @@
 const orderModel = require('./order.model');
 const inventoryService = require('../inventory/inventory.service');
 
-const getAllOrders = async () => {
-    return await orderModel.findAll();
+const getAllOrders = async (userId = null) => {
+    return await orderModel.findAll(userId);
 };
 
 const getOrderById = async (id) => {

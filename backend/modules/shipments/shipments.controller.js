@@ -1,9 +1,16 @@
 const shipmentsService = require('./shipments.service');
+const ordersService = require('../orders/orders.service');
 const apiResponse = require('../../utils/apiResponse');
 
 const getAllShipments = async (req, res, next) => {
     try {
-        const shipments = await shipmentsService.getAllShipments();
+        let orderIds = null;
+        if (req.user.role !== 'admin') {
+            const userOrders = await ordersService.getAllOrders(req.user.id);
+            orderIds = userOrders.map(order => order.id.toString());
+        }
+        
+        const shipments = await shipmentsService.getAllShipments(orderIds);
         return apiResponse.success(res, 'Shipments retrieved successfully', shipments);
     } catch (error) {
         next(error);

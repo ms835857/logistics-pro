@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 import api from '../api/axios';
 import Table from '../components/Table';
 import Modal from '../components/Modal';
@@ -7,6 +8,7 @@ import { Edit2, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const Inventory = () => {
+    const { isAdmin } = useContext(AuthContext);
     const [inventory, setInventory] = useState([]);
     const [suppliers, setSuppliers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -132,8 +134,11 @@ const Inventory = () => {
                 </div>
             )
         },
-        { header: 'Unit Price ($)', accessor: 'unit_price' },
-        {
+        { header: 'Unit Price ($)', accessor: 'unit_price' }
+    ];
+
+    if (isAdmin()) {
+        columns.push({
             header: 'Actions',
             accessor: 'actions',
             render: (row) => (
@@ -146,8 +151,8 @@ const Inventory = () => {
                     </button>
                 </div>
             )
-        }
-    ];
+        });
+    }
 
     return (
         <div className="space-y-6">
@@ -155,7 +160,9 @@ const Inventory = () => {
                 <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 tracking-tight">
                     Inventory Management
                 </h1>
-                <button onClick={() => setIsModalOpen(true)} className="btn-primary">Add Item</button>
+                {isAdmin() && (
+                    <button onClick={() => setIsModalOpen(true)} className="btn-primary">Add Item</button>
+                )}
             </div>
             
             <div className="glass-panel overflow-hidden">

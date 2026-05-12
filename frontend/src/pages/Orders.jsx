@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 import api from '../api/axios';
 import Table from '../components/Table';
 import StatusBadge from '../components/StatusBadge';
 import Modal from '../components/Modal';
 import ConfirmModal from '../components/ConfirmModal';
-import { Edit2, Trash2 } from 'lucide-react';
+import { Edit2, Trash2, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const Orders = () => {
+    const { isAdmin } = useContext(AuthContext);
     const [orders, setOrders] = useState([]);
     const [suppliers, setSuppliers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -100,6 +102,17 @@ const Orders = () => {
         }
     };
 
+    const handleCancelOrder = async (id) => {
+        if (!window.confirm('Are you sure you want to cancel this order?')) return;
+        try {
+            await api.patch(`/orders/${id}/status`, { status: 'cancelled' });
+            toast.success('Order cancelled successfully!');
+            fetchOrders();
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to cancel order');
+        }
+    };
+
     const closeModal = () => {
         setIsModalOpen(false);
         setEditId(null);
@@ -130,12 +143,22 @@ const Orders = () => {
             accessor: 'actions',
             render: (row) => (
                 <div className="flex space-x-2">
-                    <button onClick={() => handleEdit(row)} className="p-1 text-primary hover:bg-primary/10 rounded transition-colors">
-                        <Edit2 size={16} />
-                    </button>
-                    <button onClick={() => triggerDelete(row.id)} className="p-1 text-red-500 hover:bg-red-500/10 rounded transition-colors">
-                        <Trash2 size={16} />
-                    </button>
+                    {isAdmin() ? (
+                        <>
+                            <button onClick={() => handleEdit(row)} className="p-1 text-primary hover:bg-primary/10 rounded transition-colors" title="Edit Order">
+                                <Edit2 size={16} />
+                            </button>
+                            <button onClick={() => triggerDelete(row.id)} className="p-1 text-red-500 hover:bg-red-500/10 rounded transition-colors" title="Delete Order">
+                                <Trash2 size={16} />
+                            </button>
+                        </>
+                    ) : (
+                        row.status !== 'cancelled' && (
+                            <button onClick={() => handleCancelOrder(row.id)} className="p-1 text-orange-500 hover:bg-orange-500/10 rounded transition-colors" title="Cancel Order">
+                                <XCircle size={16} />
+                            </button>
+                        )
+                    )}
                 </div>
             )
         }

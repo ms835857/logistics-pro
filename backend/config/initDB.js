@@ -63,6 +63,7 @@ const initDB = async () => {
                 total_price DECIMAL(10,2) NOT NULL,
                 status VARCHAR(50) DEFAULT 'pending',
                 supplier_id INTEGER REFERENCES suppliers(id) ON DELETE SET NULL,
+                user_id VARCHAR(100),
                 created_at TIMESTAMP DEFAULT NOW(),
                 updated_at TIMESTAMP DEFAULT NOW()
             );
@@ -115,6 +116,15 @@ const initDB = async () => {
             const hashedPassword = await bcrypt.hash('admin123', salt);
             await User.create({ name: 'Admin', email: adminEmail, password: hashedPassword, role: 'admin' });
             console.log('Admin user seeded.');
+        }
+
+        const userEmail = 'user@logistics.com';
+        const existingUser = await User.findOne({ email: userEmail });
+        if (!existingUser) {
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash('user123', salt);
+            await User.create({ name: 'Test User', email: userEmail, password: hashedPassword, role: 'user' });
+            console.log('Test user seeded.');
         }
 
         const shipmentCount = await Shipment.countDocuments();

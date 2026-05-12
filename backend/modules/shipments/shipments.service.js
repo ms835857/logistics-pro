@@ -1,6 +1,9 @@
 const Shipment = require('./shipment.schema');
 
-const getAllShipments = async () => {
+const getAllShipments = async (orderIds = null) => {
+    if (orderIds) {
+        return await Shipment.find({ orderId: { $in: orderIds } }).sort({ createdAt: -1 });
+    }
     return await Shipment.find().sort({ createdAt: -1 });
 };
 

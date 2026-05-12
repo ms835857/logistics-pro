@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 import api from '../api/axios';
 import Table from '../components/Table';
 import StatusBadge from '../components/StatusBadge';
@@ -8,6 +9,7 @@ import { Edit2, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const Shipments = () => {
+    const { isAdmin } = useContext(AuthContext);
     const [shipments, setShipments] = useState([]);
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -128,8 +130,11 @@ const Shipments = () => {
             accessor: 'status',
             render: (row) => <StatusBadge status={row.status} />
         },
-        { header: 'Driver', accessor: 'driverName' },
-        {
+        { header: 'Driver', accessor: 'driverName' }
+    ];
+
+    if (isAdmin()) {
+        columns.push({
             header: 'Actions',
             accessor: 'actions',
             render: (row) => (
@@ -142,8 +147,8 @@ const Shipments = () => {
                     </button>
                 </div>
             )
-        }
-    ];
+        });
+    }
 
     return (
         <div className="space-y-6">
@@ -151,7 +156,9 @@ const Shipments = () => {
                 <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 tracking-tight">
                     Shipments Tracking
                 </h1>
-                <button onClick={() => setIsModalOpen(true)} className="btn-primary">Create Shipment</button>
+                {isAdmin() && (
+                    <button onClick={() => setIsModalOpen(true)} className="btn-primary">Create Shipment</button>
+                )}
             </div>
             
             <div className="glass-panel overflow-hidden">

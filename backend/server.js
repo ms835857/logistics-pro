@@ -21,6 +21,7 @@ app.get('/', (req, res) => {
 
 // Setup Routes (to be imported)
 app.use('/api/auth', require('./modules/auth/auth.routes'));
+app.use('/api/users', require('./modules/users/user.routes'));
 app.use('/api/orders', require('./modules/orders/orders.routes'));
 app.use('/api/inventory', require('./modules/inventory/inventory.routes'));
 app.use('/api/shipments', require('./modules/shipments/shipments.routes'));

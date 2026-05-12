@@ -12,6 +12,8 @@ import Orders from './pages/Orders';
 import Inventory from './pages/Inventory';
 import Shipments from './pages/Shipments';
 import Suppliers from './pages/Suppliers';
+import Profile from './pages/Profile';
+import Users from './pages/Users';
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -28,6 +30,8 @@ const AnimatedRoutes = () => {
         <Route path="/inventory" element={<ProtectedRoute><AnimatedPage><Inventory /></AnimatedPage></ProtectedRoute>} />
         <Route path="/shipments" element={<ProtectedRoute><AnimatedPage><Shipments /></AnimatedPage></ProtectedRoute>} />
         <Route path="/suppliers" element={<ProtectedRoute><AnimatedPage><Suppliers /></AnimatedPage></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><AnimatedPage><Profile /></AnimatedPage></ProtectedRoute>} />
+        <Route path="/admin/users" element={<ProtectedRoute adminOnly={true}><AnimatedPage><Users /></AnimatedPage></ProtectedRoute>} />
       </Routes>
     </AnimatePresence>
   );

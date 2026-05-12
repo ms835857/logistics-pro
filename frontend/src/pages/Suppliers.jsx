@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 import api from '../api/axios';
 import Table from '../components/Table';
 import Modal from '../components/Modal';
@@ -7,6 +8,7 @@ import { Edit2, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const Suppliers = () => {
+    const { isAdmin } = useContext(AuthContext);
     const [suppliers, setSuppliers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -104,8 +106,11 @@ const Suppliers = () => {
                     {row.is_active ? 'Active' : 'Inactive'}
                 </span>
             )
-        },
-        {
+        }
+    ];
+
+    if (isAdmin()) {
+        columns.push({
             header: 'Actions',
             accessor: 'actions',
             render: (row) => (
@@ -118,8 +123,8 @@ const Suppliers = () => {
                     </button>
                 </div>
             )
-        }
-    ];
+        });
+    }
 
     return (
         <div className="space-y-6">
@@ -127,7 +132,9 @@ const Suppliers = () => {
                 <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 tracking-tight">
                     Suppliers Database
                 </h1>
-                <button onClick={() => setIsModalOpen(true)} className="btn-primary">Add Supplier</button>
+                {isAdmin() && (
+                    <button onClick={() => setIsModalOpen(true)} className="btn-primary">Add Supplier</button>
+                )}
             </div>
             
             <div className="glass-panel overflow-hidden">

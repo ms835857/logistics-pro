@@ -11,10 +11,10 @@ router.get('/track/:trackingNumber', shipmentsController.trackShipment);
 router.use(protect);
 
 router.get('/', shipmentsController.getAllShipments);
-router.get('/:id', shipmentsController.getShipmentById);
+router.get('/:id', adminOnly, shipmentsController.getShipmentById);
 
-router.post('/', shipmentsController.createShipment);
-router.patch('/:id/status', shipmentsController.updateShipmentStatus);
+router.post('/', adminOnly, shipmentsController.createShipment);
+router.patch('/:id/status', adminOnly, shipmentsController.updateShipmentStatus);
 
 router.delete('/:id', adminOnly, shipmentsController.deleteShipment);
 

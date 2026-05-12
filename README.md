@@ -29,6 +29,8 @@ A full-stack web application designed for managing logistics, supply chain inven
    npm run dev
    ```
 
+
+
 ### Frontend Setup
 1. Open a new terminal and navigate to `frontend` folder: `cd frontend`
 2. Install dependencies: `npm install`
@@ -82,3 +84,33 @@ A full-stack web application designed for managing logistics, supply chain inven
 
 ## JWT Authentication
 Every route except `/register`, `/login`, and `/track/:trackingNumber` requires a valid JWT token passed in the `Authorization` header as a Bearer token.
+
+## Role-Based Access Control (RBAC)
+
+The application implements a full role-based access control system with two distinct user roles: **Admin** and **User**.
+
+### Roles and Permissions
+
+**Admin**
+- Has full access to the entire application and all endpoints.
+- Can view, edit, and delete any Order, Shipment, Inventory item, or Supplier.
+- Has exclusive access to user management (`/admin/users`) to change roles and delete accounts.
+
+**User**
+- Has limited access to the application, primarily focused on managing their own data.
+- **Orders:** Can only view and cancel their own orders. Cannot delete orders.
+- **Shipments:** Can only view shipments associated with their own orders. Cannot create, edit, or delete shipments.
+- **Inventory & Suppliers:** Can view inventory levels and supplier details (read-only). Cannot add, edit, or delete items.
+- **Profile:** Can update their own name, email, and password.
+
+### Test Credentials
+
+After running `npm run init-db`, the following default accounts are available:
+
+- **Admin Account**
+  - Email: `admin@logistics.com`
+  - Password: `admin123`
+
+- **User Account**
+  - Email: `user@logistics.com`
+  - Password: `user123`

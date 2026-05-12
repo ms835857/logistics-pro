@@ -3,7 +3,8 @@ const apiResponse = require('../../utils/apiResponse');
 
 const getAllOrders = async (req, res, next) => {
     try {
-        const orders = await ordersService.getAllOrders();
+        const userId = req.user.role === 'admin' ? null : req.user.id;
+        const orders = await ordersService.getAllOrders(userId);
         return apiResponse.success(res, 'Orders retrieved successfully', orders);
     } catch (error) {
         next(error);
@@ -13,6 +14,9 @@ const getAllOrders = async (req, res, next) => {
 const getOrderById = async (req, res, next) => {
     try {
         const order = await ordersService.getOrderById(req.params.id);
+        if (req.user.role !== 'admin' && order.user_id !== req.user.id) {
+            return apiResponse.error(res, 'Access denied: not your resource', null, 403);
+        }
         return apiResponse.success(res, 'Order retrieved successfully', order);
     } catch (error) {
         if (error.message === 'Order not found') return apiResponse.error(res, error.message, null, 404);
@@ -27,6 +31,7 @@ const createOrder = async (req, res, next) => {
             return apiResponse.error(res, 'Validation failed: Invalid order details', null, 400);
         }
 
+        req.body.user_id = req.user.id;
         const order = await ordersService.createOrder(req.body);
         return apiResponse.success(res, 'Order created successfully', order, 201);
     } catch (error) {
@@ -53,8 +58,18 @@ const updateOrderStatus = async (req, res, next) => {
             return apiResponse.error(res, 'Invalid status value', null, 400);
         }
 
-        const order = await ordersService.updateOrderStatus(req.params.id, status);
-        return apiResponse.success(res, 'Order status updated successfully', order);
+        const order = await ordersService.getOrderById(req.params.id);
+        if (req.user.role !== 'admin') {
+            if (order.user_id !== req.user.id) {
+                return apiResponse.error(res, 'Access denied: not your resource', null, 403);
+            }
+            if (status !== 'cancelled') {
+                return apiResponse.error(res, 'Users can only cancel their orders', null, 403);
+            }
+        }
+
+        const updatedOrder = await ordersService.updateOrderStatus(req.params.id, status);
+        return apiResponse.success(res, 'Order status updated successfully', updatedOrder);
     } catch (error) {
         if (error.message === 'Order not found') return apiResponse.error(res, error.message, null, 404);
         next(error);

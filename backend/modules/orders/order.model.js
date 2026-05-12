@@ -1,7 +1,14 @@
 const db = require('../../config/db.postgres');
 
-const findAll = async () => {
-    const result = await db.query('SELECT * FROM orders ORDER BY id DESC');
+const findAll = async (userId = null) => {
+    let query = 'SELECT * FROM orders';
+    let params = [];
+    if (userId) {
+        query += ' WHERE user_id = $1';
+        params.push(userId);
+    }
+    query += ' ORDER BY id DESC';
+    const result = await db.query(query, params);
     return result.rows;
 };
 
@@ -11,11 +18,11 @@ const findById = async (id) => {
 };
 
 const create = async (data) => {
-    const { customer_name, customer_email, product_name, quantity, total_price, supplier_id } = data;
+    const { customer_name, customer_email, product_name, quantity, total_price, supplier_id, user_id } = data;
     const result = await db.query(
-        `INSERT INTO orders (customer_name, customer_email, product_name, quantity, total_price, supplier_id) 
-         VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-        [customer_name, customer_email, product_name, quantity, total_price, supplier_id]
+        `INSERT INTO orders (customer_name, customer_email, product_name, quantity, total_price, supplier_id, user_id) 
+         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+        [customer_name, customer_email, product_name, quantity, total_price, supplier_id, user_id]
     );
     return result.rows[0];
 };

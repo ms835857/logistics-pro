@@ -1,10 +1,10 @@
 import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { LogOut, Package, Users, Truck, Database, LayoutDashboard } from 'lucide-react';
+import { LogOut, Package, Users, Truck, Database, LayoutDashboard, User, Shield } from 'lucide-react';
 
 const Navbar = () => {
-    const { currentUser, logout } = useContext(AuthContext);
+    const { currentUser, logout, isAdmin } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -28,9 +28,16 @@ const Navbar = () => {
                             <NavLink to="/inventory" icon={<Database size={18} />} label="Inventory" />
                             <NavLink to="/shipments" icon={<Truck size={18} />} label="Shipments" />
                             <NavLink to="/suppliers" icon={<Users size={18} />} label="Suppliers" />
+                            {isAdmin() && (
+                                <NavLink to="/admin/users" icon={<Shield size={18} />} label="Manage Users" />
+                            )}
                         </div>
                     </div>
                     <div className="flex items-center space-x-4">
+                        <Link to="/profile" className="flex items-center space-x-2 text-muted hover:text-white transition-colors border-r border-white/10 pr-4">
+                            <User size={18} />
+                            <span className="text-sm font-medium">Profile</span>
+                        </Link>
                         <div className="text-sm">
                             <span className="text-muted block text-right">{currentUser.name}</span>
                             <span className="text-xs text-primary font-semibold uppercase">{currentUser.role}</span>
