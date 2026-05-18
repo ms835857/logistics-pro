@@ -19,19 +19,19 @@ const getShipmentByTrackingNumber = async (trackingNumber) => {
     return shipment;
 };
 
-const createShipment = async (data) => {
+const createShipment = async (data, updatedBy) => {
     const shipment = new Shipment(data);
-    shipment.statusHistory.push({ status: shipment.status, note: 'Shipment created' });
+    shipment.statusHistory.push({ status: shipment.status, note: 'Shipment created', updatedBy });
     await shipment.save();
     return shipment;
 };
 
-const updateShipmentStatus = async (id, status, note) => {
+const updateShipmentStatus = async (id, status, note, updatedBy) => {
     const shipment = await Shipment.findById(id);
     if (!shipment) throw new Error('Shipment not found');
 
     shipment.status = status;
-    shipment.statusHistory.push({ status, note });
+    shipment.statusHistory.push({ status, note, updatedBy });
 
     if (status === 'delivered') {
         shipment.actualDelivery = new Date();

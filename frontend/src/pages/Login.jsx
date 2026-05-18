@@ -13,8 +13,12 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await login(email, password);
-            navigate('/dashboard');
+            const res = await login(email, password);
+            if (res.data.user.role === 'admin') {
+                navigate('/admin/dashboard');
+            } else {
+                navigate('/dashboard');
+            }
         } catch (err) {
             setError(err.response?.data?.message || 'Login failed');
         }
@@ -56,8 +60,13 @@ const Login = () => {
                     </div>
                     <button type="submit" className="btn-primary w-full mt-6">Sign In</button>
                 </form>
-                <div className="mt-6 text-center text-sm text-muted">
-                    Don't have an account? <Link to="/register" className="text-primary hover:text-white transition-colors">Register here</Link>
+                <div className="mt-6 text-center text-sm text-muted flex flex-col gap-2">
+                    <span>
+                        Don't have an account? <Link to="/register" className="text-primary hover:text-white transition-colors">Register here</Link>
+                    </span>
+                    <span>
+                        Want to track a shipment? <Link to="/track" className="text-primary hover:text-white transition-colors">Track Publicly</Link>
+                    </span>
                 </div>
             </div>
         </div>

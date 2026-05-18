@@ -2,7 +2,7 @@ const User = require('../../models/user.schema');
 const bcrypt = require('bcryptjs');
 
 const registerUser = async (userData) => {
-    const { name, email, password } = userData;
+    const { name, email, password, company_name, company_address, company_phone, industry, tax_id } = userData;
 
     // Check if user exists
     const userExists = await User.findOne({ email });
@@ -19,6 +19,12 @@ const registerUser = async (userData) => {
         name,
         email,
         password: hashedPassword,
+        company_name,
+        company_address,
+        company_phone,
+        industry,
+        tax_id,
+        role: 'user', // strictly default to 'user' from public registration
     });
 
     return user;

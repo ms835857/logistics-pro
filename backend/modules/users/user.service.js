@@ -8,7 +8,7 @@ const getMyProfile = async (userId) => {
 };
 
 const updateMyProfile = async (userId, updateData) => {
-    const { name, email } = updateData;
+    const { name, email, company_address, company_phone } = updateData;
     
     // Check if email is being updated and if it's already taken
     if (email) {
@@ -20,7 +20,7 @@ const updateMyProfile = async (userId, updateData) => {
 
     const updatedUser = await User.findByIdAndUpdate(
         userId,
-        { $set: { name, email } },
+        { $set: { name, email, company_address, company_phone } },
         { new: true, runValidators: true }
     ).select('-password');
 

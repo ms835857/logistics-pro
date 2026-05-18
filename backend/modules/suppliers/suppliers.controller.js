@@ -10,6 +10,15 @@ const getAllSuppliers = async (req, res, next) => {
     }
 };
 
+const getMySuppliers = async (req, res, next) => {
+    try {
+        const suppliers = await suppliersService.getMySuppliers(req.user.id);
+        return apiResponse.success(res, 'My suppliers retrieved successfully', suppliers);
+    } catch (error) {
+        next(error);
+    }
+};
+
 const getSupplierById = async (req, res, next) => {
     try {
         const supplier = await suppliersService.getSupplierById(req.params.id);
@@ -55,6 +64,7 @@ const deleteSupplier = async (req, res, next) => {
 
 module.exports = {
     getAllSuppliers,
+    getMySuppliers,
     getSupplierById,
     createSupplier,
     updateSupplier,

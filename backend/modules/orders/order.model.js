@@ -18,17 +18,17 @@ const findById = async (id) => {
 };
 
 const create = async (data) => {
-    const { customer_name, customer_email, product_name, quantity, total_price, supplier_id, user_id } = data;
+    const { customer_name, customer_email, product_name, quantity, total_price, delivery_address, notes, invoice_number, supplier_id, user_id } = data;
     const result = await db.query(
-        `INSERT INTO orders (customer_name, customer_email, product_name, quantity, total_price, supplier_id, user_id) 
-         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-        [customer_name, customer_email, product_name, quantity, total_price, supplier_id, user_id]
+        `INSERT INTO orders (customer_name, customer_email, product_name, quantity, total_price, delivery_address, notes, invoice_number, supplier_id, user_id) 
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
+        [customer_name, customer_email, product_name, quantity, total_price, delivery_address, notes, invoice_number, supplier_id, user_id]
     );
     return result.rows[0];
 };
 
 const update = async (id, data) => {
-    const { customer_name, customer_email, product_name, quantity, total_price, supplier_id, status } = data;
+    const { customer_name, customer_email, product_name, quantity, total_price, delivery_address, notes, supplier_id, status } = data;
     const result = await db.query(
         `UPDATE orders SET 
          customer_name = COALESCE($1, customer_name),
@@ -36,10 +36,12 @@ const update = async (id, data) => {
          product_name = COALESCE($3, product_name),
          quantity = COALESCE($4, quantity),
          total_price = COALESCE($5, total_price),
-         supplier_id = COALESCE($6, supplier_id),
-         status = COALESCE($7, status)
-         WHERE id = $8 RETURNING *`,
-        [customer_name, customer_email, product_name, quantity, total_price, supplier_id, status, id]
+         delivery_address = COALESCE($6, delivery_address),
+         notes = COALESCE($7, notes),
+         supplier_id = COALESCE($8, supplier_id),
+         status = COALESCE($9, status)
+         WHERE id = $10 RETURNING *`,
+        [customer_name, customer_email, product_name, quantity, total_price, delivery_address, notes, supplier_id, status, id]
     );
     return result.rows[0];
 };

@@ -4,13 +4,15 @@ const apiResponse = require('../../utils/apiResponse');
 
 const register = async (req, res, next) => {
     try {
-        const { name, email, password } = req.body;
-        if (!name || !email || !password) {
+        const { name, email, password, company_name, company_address, company_phone, industry, tax_id } = req.body;
+        if (!name || !email || !password || !company_name || !company_address || !company_phone || !industry) {
             return apiResponse.error(res, 'Please provide all required fields', null, 400);
         }
 
-        const user = await authService.registerUser({ name, email, password });
-        const token = generateToken(user._id, user.email, user.role);
+        const user = await authService.registerUser({ 
+            name, email, password, company_name, company_address, company_phone, industry, tax_id 
+        });
+        const token = generateToken(user._id, user.email, user.role, user.name, user.company_name);
 
         return apiResponse.success(res, 'User registered successfully', {
             token,
@@ -29,7 +31,12 @@ const login = async (req, res, next) => {
         }
 
         const user = await authService.loginUser(email, password);
-        const token = generateToken(user._id, user.email, user.role);
+        
+        if (user.is_active === false) {
+            return apiResponse.error(res, 'Account deactivated. Contact support.', null, 401);
+        }
+
+        const token = generateToken(user._id, user.email, user.role, user.name, user.company_name);
 
         return apiResponse.success(res, 'Login successful', {
             token,

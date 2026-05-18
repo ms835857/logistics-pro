@@ -10,6 +10,14 @@ const findById = async (id) => {
     return result.rows[0];
 };
 
+const findByIds = async (ids) => {
+    if (!ids || ids.length === 0) return [];
+    // Creating parameterized query like $1, $2, $3
+    const params = ids.map((_, i) => `$${i + 1}`).join(',');
+    const result = await db.query(`SELECT * FROM suppliers WHERE id IN (${params}) ORDER BY id DESC`, ids);
+    return result.rows;
+};
+
 const create = async (data) => {
     const { name, contact_person, email, phone, address, country } = data;
     const result = await db.query(
@@ -48,6 +56,7 @@ const softDelete = async (id) => {
 module.exports = {
     findAll,
     findById,
+    findByIds,
     create,
     update,
     softDelete

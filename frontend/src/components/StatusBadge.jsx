@@ -1,23 +1,31 @@
 import React from 'react';
 
 const StatusBadge = ({ status }) => {
-    const statusStyles = {
-        pending: 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30',
-        confirmed: 'bg-blue-500/20 text-blue-500 border-blue-500/30',
-        dispatched: 'bg-indigo-500/20 text-indigo-500 border-indigo-500/30',
-        delivered: 'bg-emerald-500/20 text-emerald-500 border-emerald-500/30',
-        cancelled: 'bg-red-500/20 text-red-500 border-red-500/30',
-        preparing: 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30',
-        'in-transit': 'bg-indigo-500/20 text-indigo-500 border-indigo-500/30',
-        'out-for-delivery': 'bg-blue-500/20 text-blue-500 border-blue-500/30',
-        failed: 'bg-red-500/20 text-red-500 border-red-500/30',
+    const getStatusStyle = (status) => {
+        switch (status?.toLowerCase()) {
+            // Order statuses
+            case 'pending':
+            case 'preparing':
+                return 'bg-amber-500/20 text-amber-500 border border-amber-500/30';
+            case 'confirmed':
+                return 'bg-blue-500/20 text-blue-500 border border-blue-500/30';
+            case 'dispatched':
+            case 'in-transit':
+            case 'out-for-delivery':
+                return 'bg-purple-500/20 text-purple-400 border border-purple-500/30';
+            case 'delivered':
+                return 'bg-green-500/20 text-green-500 border border-green-500/30';
+            case 'cancelled':
+            case 'failed':
+                return 'bg-red-500/20 text-red-500 border border-red-500/30';
+            default:
+                return 'bg-gray-500/20 text-gray-400 border border-gray-500/30';
+        }
     };
 
-    const style = statusStyles[status.toLowerCase()] || 'bg-slate-500/20 text-slate-400 border-slate-500/30';
-
     return (
-        <span className={`px-3 py-1 rounded-full text-xs font-medium border ${style}`}>
-            {status.charAt(0).toUpperCase() + status.slice(1)}
+        <span className={`px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${getStatusStyle(status)}`}>
+            {status?.replace(/-/g, ' ')}
         </span>
     );
 };

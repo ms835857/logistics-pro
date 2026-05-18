@@ -26,6 +26,8 @@ app.use('/api/orders', require('./modules/orders/orders.routes'));
 app.use('/api/inventory', require('./modules/inventory/inventory.routes'));
 app.use('/api/shipments', require('./modules/shipments/shipments.routes'));
 app.use('/api/suppliers', require('./modules/suppliers/suppliers.routes'));
+app.use('/api/clients', require('./modules/clients/clients.routes'));
+app.use('/api/dashboard', require('./modules/dashboard/dashboard.routes'));
 
 // Error Middleware
 app.use(notFound);

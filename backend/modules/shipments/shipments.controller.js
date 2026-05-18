@@ -42,7 +42,7 @@ const createShipment = async (req, res, next) => {
         const { orderId } = req.body;
         if (!orderId) return apiResponse.error(res, 'Order ID is required', null, 400);
 
-        const shipment = await shipmentsService.createShipment(req.body);
+        const shipment = await shipmentsService.createShipment(req.body, req.user.name);
         return apiResponse.success(res, 'Shipment created successfully', shipment, 201);
     } catch (error) {
         next(error);
@@ -59,7 +59,7 @@ const updateShipmentStatus = async (req, res, next) => {
             return apiResponse.error(res, 'Invalid status', null, 400);
         }
 
-        const shipment = await shipmentsService.updateShipmentStatus(req.params.id, status, note || '');
+        const shipment = await shipmentsService.updateShipmentStatus(req.params.id, status, note || '', req.user.name);
         return apiResponse.success(res, 'Shipment status updated successfully', shipment);
     } catch (error) {
         if (error.message === 'Shipment not found') return apiResponse.error(res, error.message, null, 404);

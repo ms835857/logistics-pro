@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const statusHistorySchema = new mongoose.Schema({
     status: String,
     note: String,
+    updatedBy: String,
     updatedAt: {
         type: Date,
         default: Date.now
